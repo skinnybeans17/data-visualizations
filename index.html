@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+	<svg id="svg" width="800" height="1000">
+  </svg>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    d3.csv('populated-cities.csv')
+    .then(data => {
+      const continents = Array.from(new Set(data.map(d => d.continent)))
+      const x_extent = d3.extent(data, d => parseFloat(d.Pop2023))
+      const y_extent = d3.extent(data, d => parseFloat(d.Pop2022))
+      const xScale = d3.scaleLinear()
+        .domain(x_extent)
+        .range([700, 100])
+      const yScale = d3.scaleLinear()
+        .domain(y_extent)
+        .range([700, 100])
+      const continentScale = d3.scaleOrdinal()
+        .domain(['Asia', 'North America', 'South America', 'Africa', 'Europe'])
+        .range(['cornflowerblue', 'gold', 'green', 'tomato', 'magenta'])
+      const popScale = d3.scaleLinear()
+        .domain([525010, 14910352])
+        .range([10, 200])
+      d3.select('#svg')
+          .style('border', '1px solid')
+          .style('background-color', 'white')
+          .selectAll('circle')
+          .data(data)
+          .enter()
+          .append('circle')
+          .attr('cx', d => xScale(parseFloat(d.Pop2023)))
+          .attr('cy', d => xScale(parseFloat(d.Pop2022)))
+          .attr('fill', d => continentScale(d.continent))
+          .attr('opacity', 0.25)
+          .attr('r', d => parseInt(d.rank) * 5)
+          .attr('fill', d => continentScale(d.continent))
+    const node = d3.select('#svg')
+        .style('border', '1px solid')
+        .selectAll('g')
+        .data(data)
+        .enter()
+    const groups = node
+        .append('g')
+    const angle = Math.PI * 1.75
+      groups
+        .append('text')
+        .text(d => d.label) // set the text
+        .attr('x', d => xScale(d.Pop2023) + (Math.cos(angle) * popScale(d.population) + 15))
+        .attr('y', d => yScale(d.Pop2022) + (Math.sin(angle) * popScale(d.population) - 10))
+        .style('font-family', 'Helvetica')
+        .style('font-size', '18px')
+      
+      const width = 800
+      const height = 1000
+      const margin = 60
+      const svg = d3
+        .select('#svg')
+      const bottomAxis = d3.axisBottom(xScale)
+      const leftAxis = d3.axisLeft(yScale)
+      svg
+        .append('g')
+        .attr('transform', `translate(0, ${height - margin})`)
+        .call(bottomAxis)
+      svg
+        .append('g')
+        .attr('transform', `translate(${margin}, 0)`)
+        .call(leftAxis)
+
+
+      });
+  </script>
+</body>
+</html>
